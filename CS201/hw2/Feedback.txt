@@ -1,0 +1,12 @@
+Q1)
+
+No discussion on the best algorithm for arrays with a lower size -10
+
+Q2)
+
+Wrong results for quick and bubble -6
+Discussion -6
+
+Q3) 
+
+-
