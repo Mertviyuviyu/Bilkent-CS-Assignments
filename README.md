@@ -1,3 +1,4 @@
+
 # Bilkent CS Assignments
 This is the repository that contains all of my Computer Science assignments at Bilkent University. I am considering to update this repository after every semester.
 
@@ -23,3 +24,14 @@ Language: C++
 Language: SystemVerilog
 
 23-24 Spring
+## CS202: Fundamental Structures of Computer Science II
+Language: C++
+
+24-25 Fall
+
+***Note:** HW2 Questions 2,3,4 didn't passed every test*
+## CS224: Computer Organization
+Languages: Mips Assembly, SystemVerilog
+
+24-25 Fall
+
