@@ -1,0 +1,228 @@
+CS224
+Section 3
+Lab7
+
+
+Anil Keskin
+22201915
+
+Mustafa Mert Gülhan
+22201895
+
+
+—------------
+/*
+
+
+1.LATA: Latch register for the module A
+2.LATE: Latch register for the module E
+3.TRISA: Data direction register for the module A
+4.TRISE: Data direction register for the module E
+5.PORTE: Port register for the module E (for button inputs, in addition to LATE,)
+*/
+
+
+/*
+Configuration for the code below:
+
+
+Connect portA to J1 Port of 4 Digit Seven Segment Module
+Jumpers of portA are : 5V, pull down ( top one to left, other to right )
+
+
+Connect portE to J2 Port of 4 Digit Seven Segment Module
+Jumpers of portE are : 5V, pull down ( top one to left, other to right )
+
+
+*/
+
+
+// Hexadecimal values for digits in 7 segment
+unsigned char binary_pattern[]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+
+void main() {
+    
+    AD1PCFG = 0xFFFF;        //  Configure AN pins as digital I/O
+    DDPCON.JTAGEN = 0;
+    JTAGEN_bit = 0;        // Disable JTAG
+        
+    
+
+ // Initialize ports
+    LATE = 0x0000;
+    LATA = 0x0000;
+
+//TRISE = 0x0000; 
+TRISE = 0xFFFF;  //inputs
+    TRISA = 0x0000;  // outputs
+
+
+   
+unsigned int stateCheck = 0; //we check for both button press and this variable is a counter
+    while(1) {
+       
+//whilst button0 pressed but the button1 not (turn of clockwise)
+ if (!PORTEbits.RE1 && (PORTEbits.RE0 )) { counterclockwise
+            Delay_ms(1000);  
+            LATAbits.LATA1 = 1;   //  motor is counterclockwise at LATA1
+              unsigned int i;
+while( stateCheck<1000){
+stateCheck++;
+        Delay_ms(1);
+        if(!PORTEbits.RE1 && PORTEbits.RE0){ //when both button pressed it someway translates to invert of the input of the buttons
+stateCheck = 0;
+        break;
+}
+}
+            LATAbits.LATA1 = 0;   // Motor is stopped
+        }
+//the opposite case of previous if statement 
+
+        else if (PORTEbits.RE1 && !(PORTEbits.RE0 )) { 
+            Delay_ms(1000); // 1 second delay for motor to be started  
+            LATAbits.LATA2 = 1;   // motor is clockwise at LATA2
+            unsigned int i;
+        while(stateCheck<1000){ // 1 second delay for motor to be stopped ;; later functions has the same logic
+stateCheck++;
+        Delay_ms(1);
+        if(!PORTEbits.RE1 && !PORTEbits.RE0){
+stateCheck = 0;
+        break;
+}
+}
+            LATAbits.LATA2 = 0;   // Stop motor
+        }
+       
+        else {
+            
+        LATAbits.LATA1 = 0; //Motor directions set 0
+LATAbits.LATA2 = 0;        //Motor directions set 0
+LATA = 0x0000; //Motor is sropped
+stateCheck = 0;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+—----
+—---
+—---
+/*
+1.LATA: Latch register for the module A
+2.LATE: Latch register for the module E
+3.TRISA: Data direction register for the module A
+4.TRISE: Data direction register for the module E
+*/
+
+
+
+
+
+
+
+
+/*
+Configuration for the code below:
+
+
+Connect portA to J1 Port of 4 Digit Seven Segment Module
+Jumpers of portA are : 5V, pull down ( top one to left, other to right )
+
+
+Connect portE to J2 Port of 4 Digit Seven Segment Module
+Jumpers of portE are : 5V, pull down ( top one to left, other to right )
+
+
+*/
+
+
+// Hexadecimal values for digits in 7 segment
+unsigned char binary_pattern[]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
+
+
+
+
+void main() {
+ unsigned int displaycounter = 0; // makes convention of numbers being displayed correlated to their value
+ unsigned int fib_current = 0; //the current number of fibonacci that will put up in digit-segment display
+ unsigned int fib_prev = 1; //holds previous numbers for fibbonacci calculation
+ unsigned int numbers[4] = {0}; //takes number from fib_current and puts it to digit-display
+unsigned int tmp;
+    
+     AD1PCFG = 0xFFFF;      // Configure AN pins as digital I/O
+ JTAGEN_bit = 0;        // Disable JTAG
+
+
+
+
+ TRISA = 0x00;  //portA is output to D
+ TRISE = 0X00;  //portE is output to AN
+
+
+
+
+    while(1) { // #always begin
+        //numbers take the number from fib_current base-of-ten-wise to display it 
+        numbers[3] = fib_current / 1000;        // thousands of the number
+        numbers[2] = (fib_current / 100) % 10;  // hundreds of the number
+        numbers[1] = (fib_current / 10) % 10;   // tens of the number
+        numbers[0] = fib_current % 10;          // ones of the number
+
+
+        for(displaycounter = 0; displaycounter < fib_current*25; displaycounter++) {
+ /*we want numbers to be displayed correlated to their values as lab_documentation suggests it is set to number*100 ms which is fib_current*25 where *4ms comes from the time taken during digit display */
+ 
+//Digits are displayed as per example code suggestion
+PORTA= binary_pattern[numbers[0]];
+PORTE = 0x08
+Delay_ms(1);
+
+
+PORTA= binary_pattern[numbers[1]];
+PORTE = 0x04
+Delay_ms(1);
+
+
+PORTA= binary_pattern[numbers[2]];
+PORTE = 0x02
+Delay_ms(1);
+
+
+PORTA= binary_pattern[numbers[3]];
+PORTE = 0x01
+Delay_ms(1);
+        
+        }
+        
+//Below calculates the previous fibonacci number
+        tmp = fib_current + fib_prev;
+fib_current = fib_prev;
+fib_prev = tmp;                
+
+
+     
+displaycounter= 0;
+//whole program is resetted
+        if(fib_current > 9999) { //after 9999 segmentdisplay overflows
+            fib_current = 0;
+            fib_prev = 1;
+displaycounter = 0;
+            Delay_ms(1);  
+        }
+    }
+}
+
+
+
+
+—----
+—----
+—----
+—----
+________________

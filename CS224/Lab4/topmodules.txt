@@ -1,0 +1,41 @@
+
+//FOR BASYS
+
+module top  (input   logic 	 clk, reset,           
+	     output  logic       memwrite,
+	     input logic sw_input,
+	     output logic [6:0] seg, output logic dp,output logic[3:0] an);    
+
+   logic [31:0] instr, pc;
+   logic[31:0] writedata, dataadr, readdata;
+   
+   logic newclk;
+   
+   pulse_controller puls(clk,sw_input,0,newclk);
+   display_controller disp(clk,writedata[7:4],writedata[3:0],dataadr[7:4],dataadr[3:0],seg,dp,an);
+
+   // instantiate processor and memories  
+   mips mips (newclk, reset, pc, instr, memwrite, dataadr, writedata, readdata);  
+   imem imem (pc[7:0], instr);  
+   dmem dmem (newclk, memwrite, dataadr, writedata, readdata);
+   
+endmodule
+
+
+//FOR TESTBENCH
+
+module top  (input   logic 	 clk, reset,            
+	     output  logic[31:0] writedata, dataadr, 
+	     output  logic[31:0] readdata,           
+	     output  logic       memwrite,
+	     output  logic[31:0] instruction,pcout);    
+
+   logic [31:0] instr, pc;
+   // instantiate processor and memories  
+   mips mips (clk, reset, pc, instr, memwrite, dataadr, writedata, readdata);  
+   imem imem (pc[7:0], instr);  
+   dmem dmem (clk, memwrite, dataadr, writedata, readdata);
+   
+   assign instruction = instr;
+   assign pcout = pc;
+endmodule
